@@ -1,0 +1,17 @@
+Gemfile
+.env.example
+app/controllers/chat_controller.rb
+app/controllers/messages_controller.rb
+app/controllers/conversations_controller.rb
+app/services/cohere_client.rb
+app/services/file_content_extractor.rb
+app/models/conversation.rb
+app/models/message.rb
+app/views/chat/index.html.erb
+app/views/chat/_message.html.erb
+app/javascript/application.js
+app/assets/stylesheets/application.css
+config/routes.rb
+config/storage.yml
+config/database.yml
+README.md

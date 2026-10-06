@@ -1,0 +1,13 @@
+<div class="conversation-item <%= 'active' if active %>" data-conversation-item data-conversation-id="<%= conversation.id %>">
+  <%= link_to conversation_path(conversation), class: "conversation-link" do %>
+    <span class="conversation-name"><%= conversation.title %></span>
+    <small><%= conversation.messages.count %> msgs</small>
+  <% end %>
+  <div class="conversation-actions">
+    <button type="button" class="conversation-menu-toggle" data-conversation-menu-toggle aria-label="Actions for <%= conversation.title %>" aria-haspopup="menu" aria-expanded="false">...</button>
+    <div class="conversation-menu" role="menu" hidden>
+      <button type="button" role="menuitem" data-conversation-action="rename">Rename</button>
+      <button type="button" role="menuitem" class="delete-action" data-conversation-action="delete">Delete</button>
+    </div>
+  </div>
+</div>

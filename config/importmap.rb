@@ -1,0 +1,6 @@
+pin "application", to: "application.js"
+pin "resume_builder", to: "resume_builder.js"
+pin "ai_humanizer", to: "ai_humanizer.js"
+pin "ai_checker", to: "ai_checker.js"
+pin "sound_to_text", to: "sound_to_text.js"
+pin "generate_photo", to: "generate_photo.js"

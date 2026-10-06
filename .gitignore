@@ -1,0 +1,10 @@
+/.bundle
+/db/*.sqlite3
+/db/*.sqlite3-*
+/log/*
+/tmp/*
+/storage/*
+/public/assets
+/public/packs
+/node_modules
+/.env

@@ -1,0 +1,35 @@
+<article class="message <%= message.role %>" data-message-id="<%= message.id %>">
+  <div class="avatar"><%= message.role == "user" ? "You" : "AI" %></div>
+  <div class="message-body">
+    <div class="message-role"><%= message.role.capitalize %></div>
+    <% if message.content.present? %>
+      <div class="message-content"><%= simple_format(h(message.content)) %></div>
+    <% end %>
+
+    <% if message.files.attached? %>
+      <div class="attachments">
+        <% message.files.each do |file| %>
+          <a class="attachment-card" href="<%= rails_blob_path(file, disposition: "inline") %>" target="_blank" rel="noreferrer">
+            <span class="attachment-icon"><%= file.content_type.to_s.start_with?("image/") ? "▣" : "◫" %></span>
+            <span class="attachment-meta">
+              <strong><%= file.filename %></strong>
+              <small><%= number_to_human_size(file.byte_size) %></small>
+            </span>
+          </a>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% citations = message.metadata.is_a?(Hash) ? message.metadata["citations"] : [] %>
+    <% if message.role == "assistant" && citations.present? %>
+      <details class="citations">
+        <summary>Sources from uploaded files (<%= citations.length %>)</summary>
+        <div class="citation-list">
+          <% citations.each do |citation| %>
+            <div><%= citation.to_json %></div>
+          <% end %>
+        </div>
+      </details>
+    <% end %>
+  </div>
+</article>

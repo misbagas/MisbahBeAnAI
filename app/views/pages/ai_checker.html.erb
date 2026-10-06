@@ -1,0 +1,139 @@
+<% content_for :title, "AI Checker | Cohere Chatbot" %>
+<% content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <%= stylesheet_link_tag "ai_checker", "data-turbo-track": "reload" %>
+<% end %>
+<main class="app-shell ai-checker-page" data-ai-checker data-check-url="<%= check_ai_checker_path %>" data-extract-url="<%= extract_ai_checker_document_path %>">
+    <header class="topbar">
+      <div>
+        <h1>AI Checker</h1>
+        <p>Review writing-style patterns and get a signal, not a verdict.</p>
+      </div>
+      <button class="ghost-btn" id="pastChecksBtn" type="button" title="View previous checks">
+        <span class="icon">↶</span>
+        Past checks
+      </button>
+    </header>
+
+    <section class="workspace">
+      <article class="editor-card card">
+        <div class="editor-toolbar">
+          <div class="segmented-control" role="tablist" aria-label="Input mode">
+            <button class="segment active" data-mode="text" type="button" role="tab" aria-selected="true">Text</button>
+            <button class="segment" data-mode="upload" type="button" role="tab" aria-selected="false">Upload document</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <button class="text-btn" id="pasteBtn" type="button">Paste text</button>
+            <button class="icon-btn" id="clearBtn" type="button" aria-label="Clear text" title="Clear text">⌫</button>
+          </div>
+        </div>
+
+        <div class="editor-content">
+          <div id="uploadPanel" class="upload-panel hidden">
+            <label class="dropzone" for="fileInput">
+              <div class="upload-icon">↥</div>
+              <strong>Drop a document here</strong>
+              <span>or click to browse · TXT, MD, CSV, DOCX, PDF</span>
+              <input id="fileInput" type="file" accept=".txt,.md,.csv,.docx,.pdf" hidden />
+            </label>
+            <div id="fileMeta" class="file-meta hidden"></div>
+          </div>
+
+          <div id="textPanel">
+            <label class="sr-only" for="editor">Text to check</label>
+            <textarea id="editor" spellcheck="true">Last Tuesday, I left my phone in the kitchen and took my coffee outside. It was a small thing, but for the first time in weeks, I actually noticed the morning. The neighbor's dog was arguing with a squirrel. My coffee was already going cold.
+
+In today's fast-paced world, it is essential to prioritize mindfulness and establish intentional routines that promote overall well-being.
+
+But here's what I've learned: you don't need a perfect routine. You just need a few minutes that belong to you. Some mornings, that means a walk. Other mornings, it's sitting quietly before everyone else wakes up. Start there, and see what changes.</textarea>
+          </div>
+
+          <div class="editor-footer">
+            <div class="legend">
+              <span><i class="dot human"></i>Likely human</span>
+              <span><i class="dot mixed"></i>Mixed signals</span>
+              <span><i class="dot ai"></i>Likely AI</span>
+            </div>
+            <div class="limits"><span id="wordCount">0 words</span><span>English</span><span>Minimum 80 words · Up to 10,000</span></div>
+          </div>
+        </div>
+
+        <div class="editor-bottom">
+          <span id="creditText">AI review is an estimate, not proof.</span>
+          <button class="primary-btn" id="checkBtn" type="button">
+            <span class="spin-icon">◌</span>
+            Check text
+          </button>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <section class="results-card card">
+          <div class="card-heading">
+            <h2>Your results</h2>
+            <button class="info-btn" type="button" aria-label="About your results" title="About your results">i</button>
+          </div>
+
+          <div class="score-wrap">
+            <div class="score-ring" id="scoreRing" >
+              <div class="score-center">
+                <strong id="scoreValue">—</strong>
+                <span>human-style signal</span>
+              </div>
+            </div>
+            <span class="status-pill" id="statusPill">No analysis yet</span>
+          </div>
+
+          <p class="result-summary">
+            Run a check to see writing-style signals. These results cannot verify who wrote the text.
+          </p>
+
+          <div class="result-breakdown">
+            <div><span class="break-label human-text">Likely human</span><strong id="humanCount">— sentences</strong></div>
+            <div><span class="break-label mixed-text">Mixed signals</span><strong id="mixedCount">— sentences</strong></div>
+            <div><span class="break-label ai-text">Likely AI</span><strong id="aiCount">— sentences</strong></div>
+          </div>
+        </section>
+
+        <section class="look-card card">
+          <div class="look-title">
+            <span class="bulb">♧</span>
+            <h2>A closer look</h2>
+          </div>
+          <p id="closerText">Run a check to get context for patterns that may be worth a second look.</p>
+          <%= link_to "Refine with AI Humanizer →", ai_humanizer_path, class: "link-btn", data: { turbo: false } %>
+          <button class="secondary-btn" id="exportBtn" type="button" disabled>
+            <span>⇩</span> Export report
+          </button>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="notice">
+      <div class="shield">♢</div>
+      <div>
+        <strong>A helpful signal, not a final verdict</strong>
+        <p>Your text goes to Cohere for a stylistic review. Results are probabilistic, cannot verify authorship, and should not be used as sole evidence. Past checks stay in this browser.</p>
+      </div>
+    </footer>
+  </main>
+
+  <div class="history-backdrop" id="pastChecksModal" hidden>
+    <section class="history-dialog" role="dialog" aria-modal="true" aria-labelledby="pastChecksTitle">
+      <header class="history-header">
+        <div><span class="history-eyebrow">This browser</span><h2 id="pastChecksTitle">Past checks</h2></div>
+        <button class="history-close" id="closePastChecksBtn" type="button" aria-label="Close past checks">×</button>
+      </header>
+      <div class="past-check-list" id="pastChecksList"></div>
+      <footer class="history-footer">
+        <button class="secondary-btn" id="clearPastChecksBtn" type="button">Clear history</button>
+        <button class="primary-btn" id="donePastChecksBtn" type="button">Done</button>
+      </footer>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+

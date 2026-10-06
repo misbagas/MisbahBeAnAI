@@ -1,0 +1,62 @@
+<% content_for :title, "AI Services | Cohere Chatbot" %>
+
+<main class="services-page">
+  <div class="services-content">
+    <header class="services-hero">
+      <div>
+        <p class="services-eyebrow">EVERYTHING YOU NEED</p>
+        <h1>Powerful AI services,<br><span>made simple.</span></h1>
+      </div>
+      <p class="services-intro">Choose a tool below and jump directly into your workflow.</p>
+    </header>
+
+    <section class="services-grid" aria-label="AI services">
+      <% @services.each do |service| %>
+        <article class="service-card <%= 'service-card--popular' if service[:category] == 'POPULAR' %>">
+          <div class="service-card-meta">
+            <% if service[:category] == "POPULAR" %>
+              <span class="service-popular">POPULAR</span>
+            <% else %>
+              <span class="service-category"><%= service[:category] %></span>
+            <% end %>
+            <span class="service-number"><%= service[:number] %></span>
+          </div>
+
+          <div class="service-icon service-icon--<%= service[:tone] %>" aria-hidden="true"><%= service[:icon] %></div>
+          <h2><%= service[:title] %></h2>
+          <p class="service-description"><%= service[:description] %></p>
+
+          <% if service[:slug] == "resume-builder" %>
+            <%= link_to resume_builder_path, class: "service-card-action", data: { turbo: false }, aria: { label: "Open #{service[:title]}" } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% elsif service[:slug] == "ai-humanizer" %>
+            <%= link_to ai_humanizer_path, class: "service-card-action", data: { turbo: false }, aria: { label: "Open #{service[:title]}" } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% elsif service[:slug] == "ai-checker" %>
+            <%= link_to ai_checker_path, class: "service-card-action", data: { turbo: false }, aria: { label: "Open #{service[:title]}" } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% elsif service[:slug] == "sound-to-text" %>
+            <%= link_to sound_to_text_path, class: "service-card-action", data: { turbo: false }, aria: { label: "Open #{service[:title]}" } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% elsif service[:slug] == "generate-photo" %>
+            <%= link_to generate_photo_path, class: "service-card-action", data: { turbo: false }, aria: { label: "Open #{service[:title]}" } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% elsif service[:connected] %>
+            <%= link_to new_conversation_path(prompt: service[:prompt]), class: "service-card-action", data: { turbo: false } do %>
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            <% end %>
+          <% else %>
+            <span class="service-card-action service-card-action--disabled" aria-disabled="true" title="A service provider has not been connected yet.">
+              <span><%= service[:action] %></span><span aria-hidden="true">&rarr;</span>
+            </span>
+          <% end %>
+        </article>
+      <% end %>
+    </section>
+  </div>
+</main>

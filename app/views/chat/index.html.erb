@@ -1,0 +1,62 @@
+<div class="app-shell" data-chat-root data-conversation-id="<%= @conversation.persisted? ? @conversation.id : 'new' %>">
+  <aside class="sidebar">
+    <div class="brand">MisbahExploit<span>AI</span></div>
+
+    <%= link_to "+  New chat", new_conversation_path, class: "new-chat-button" %>
+    <%= link_to "All Service", all_service_path, class: "all-service-button" %>
+
+    <div class="sidebar-title">Recent chats</div>
+    <div class="conversation-list" id="conversation-list">
+      <% @conversations.each do |conversation| %>
+        <%= render "chat/conversation", conversation: conversation, active: conversation.id == @conversation.id %>
+      <% end %>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="model-pill"><span></span> <%= ENV.fetch("COHERE_MODEL", "command-a-plus-05-2026") %></div>
+      <div class="model-pill"><span></span> Vision enabled</div>
+    </div>
+  </aside>
+
+  <main class="chat-panel">
+    <header class="chat-header">
+      <div>
+        <h1><%= @conversation.title %></h1>
+        <p>Ask questions, upload files, and analyze images.</p>
+      </div>
+      <div class="header-badge">11 files / message</div>
+    </header>
+
+    <section class="messages" id="messages" aria-live="polite">
+      <% if @conversation.messages.empty? %>
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">✦</div>
+          <h2>What can I help you with?</h2>
+          <p>Upload PDFs, documents, spreadsheets, code, or images and ask the AI to analyze them.</p>
+          <div class="suggestions">
+            <button data-suggestion="Summarize the uploaded files">Summarize my files</button>
+            <button data-suggestion="Extract the important information from these files">Extract key information</button>
+            <button data-suggestion="Review this image and explain what it shows">Analyze this image</button>
+          </div>
+        </div>
+      <% else %>
+        <% @conversation.messages.order(:created_at).each do |message| %>
+          <%= render "chat/message", message: message %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <form id="message-form" class="composer" enctype="multipart/form-data">
+      <div id="file-preview" class="file-preview hidden"></div>
+      <div class="composer-row">
+        <label class="attach-button" title="Attach files">
+          <input id="file-input" type="file" name="files[]" multiple>
+          <span>＋</span>
+        </label>
+        <textarea id="message-input" name="content" rows="1" placeholder="Message Cohere…"><%= @initial_prompt %></textarea>
+        <button id="send-button" class="send-button" type="submit">Send</button>
+      </div>
+      <div class="composer-help">Drag & drop files here or click ＋. Maximum 11 files per message, 25 MB each.</div>
+    </form>
+  </main>
+</div>

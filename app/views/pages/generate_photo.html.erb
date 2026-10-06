@@ -1,0 +1,146 @@
+<% content_for :title, "Generate Photo | Cohere Chatbot" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "generate_photo", "data-turbo-track": "reload" %>
+<% end %>
+
+<main class="app-shell generate-photo-page" data-generate-photo>
+  <header class="topbar">
+    <div>
+      <p class="workspace-label">IMAGE WORKSPACE · PREVIEW</p>
+      <h1>Generate photo</h1>
+      <p>Imagine it. Describe it. Make it real.</p>
+    </div>
+    <div class="topbar-actions">
+      <%= link_to "All services", all_service_path, class: "ghost-btn back-link", data: { turbo: false } %>
+      <button class="ghost-btn" type="button" id="creationsBtn"><span class="icon" aria-hidden="true">▣</span>My creations</button>
+    </div>
+  </header>
+
+  <section class="workspace" aria-label="Image generation workspace">
+    <aside class="control-panel">
+      <div class="panel-heading"><h2>Create an image</h2><span class="pill">IMAGE</span></div>
+
+      <div class="field-group">
+        <label for="model">Model</label>
+        <div class="select-wrap">
+          <select id="model"><option>Forma Image 2.0</option><option>Forma Image 1.5</option><option>Forma Fast</option></select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="label-row"><label for="prompt">Your prompt</label><button class="text-action" id="enhanceBtn" type="button">✦ Add detail</button></div>
+        <textarea id="prompt" maxlength="2000" placeholder="Describe the image you want to create...">A secluded modern cabin by an alpine lake, surrounded by evergreen trees and dramatic mountains. Soft morning light, a little mist on the water. Editorial travel photography, warm and peaceful.</textarea>
+        <div class="counter"><span id="charCount">0</span> / 2,000</div>
+      </div>
+
+      <div class="field-group">
+        <label for="style">Style</label>
+        <div class="select-wrap"><select id="style"><option>Photorealistic</option><option>Cinematic</option><option>Editorial</option><option>Illustration</option></select></div>
+      </div>
+
+      <fieldset class="field-group ratio-field">
+        <legend>Aspect ratio</legend>
+        <div class="ratio-grid" id="ratioGrid">
+          <button class="ratio-btn" data-ratio="1 / 1" type="button" aria-pressed="false"><span class="ratio-icon square"></span><span>1:1</span></button>
+          <button class="ratio-btn active" data-ratio="3 / 2" type="button" aria-pressed="true"><span class="ratio-icon landscape"></span><span>3:2</span></button>
+          <button class="ratio-btn" data-ratio="16 / 9" type="button" aria-pressed="false"><span class="ratio-icon wide"></span><span>16:9</span></button>
+          <button class="ratio-btn" data-ratio="9 / 16" type="button" aria-pressed="false"><span class="ratio-icon portrait"></span><span>9:16</span></button>
+        </div>
+      </fieldset>
+
+      <div class="two-col">
+        <div class="field-group compact">
+          <label for="quality">Quality</label>
+          <div class="select-wrap"><select id="quality"><option>High · 1.5K</option><option>Ultra · 2K</option><option>Standard · 1K</option></select></div>
+        </div>
+        <div class="field-group compact">
+          <label for="images">Images</label>
+          <div class="select-wrap"><select id="images"><option value="4">4 images</option><option value="3">3 images</option><option value="2">2 images</option><option value="1">1 image</option></select></div>
+        </div>
+      </div>
+
+      <button class="advanced-toggle" id="advancedToggle" type="button" aria-expanded="false" aria-controls="advancedContent"><span>Advanced settings</span><span class="chevron" aria-hidden="true">⌄</span></button>
+      <div class="advanced-content" id="advancedContent" hidden>
+        <div class="field-group compact"><label for="seed">Seed</label><input id="seed" type="number" placeholder="Auto" /></div>
+        <label class="switch-row"><span>Prompt boost</span><input id="promptBoost" type="checkbox" checked /></label>
+      </div>
+
+      <button class="primary-btn" id="generateBtn" type="button"><span class="sparkle" aria-hidden="true">✣</span><span id="generateBtnText">Generate 4 images</span></button>
+      <p class="credits">Preview only · image generation is not connected</p>
+    </aside>
+
+    <section class="results-panel" aria-label="Sample image results">
+      <div class="results-header">
+        <div><h2>Your imagination, brought to life</h2><p><span id="headerCount">4 sample images</span> · Example gallery</p></div>
+        <div class="tabs" role="tablist" aria-label="Image results">
+          <button class="tab active" id="latestTab" data-view="latest" type="button" role="tab" aria-selected="true" aria-controls="latestView">Latest</button>
+          <button class="tab" id="historyTab" data-view="history" type="button" role="tab" aria-selected="false" aria-controls="historyView">History</button>
+        </div>
+      </div>
+
+      <div id="latestView" role="tabpanel" aria-labelledby="latestTab">
+        <div class="preview-notice"><strong>Sample gallery.</strong> These example photos are not generated from your prompt.</div>
+        <div class="gallery" id="gallery">
+          <article class="image-card selected" role="group" tabindex="0" aria-label="Morning refuge sample image" data-title="Morning refuge">
+            <div class="image-wrap">
+              <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Mountain landscape in soft morning light" loading="eager" />
+              <button class="select-check" type="button" aria-label="Select Morning refuge" aria-pressed="true">✓</button>
+              <button class="expand-btn" type="button" aria-label="View Morning refuge larger">⛶</button>
+            </div><div class="image-meta"><span>Morning refuge</span><span>1536 × 1024</span></div>
+          </article>
+          <article class="image-card" role="group" tabindex="0" aria-label="Lakeside stillness sample image" data-title="Lakeside stillness">
+            <div class="image-wrap">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Quiet lake surrounded by forest and mountains" loading="lazy" />
+              <button class="select-check" type="button" aria-label="Select Lakeside stillness" aria-pressed="false">✓</button>
+              <button class="expand-btn" type="button" aria-label="View Lakeside stillness larger">⛶</button>
+            </div><div class="image-meta"><span>Lakeside stillness</span><span>1536 × 1024</span></div>
+          </article>
+          <article class="image-card" role="group" tabindex="0" aria-label="Into the alpine sample image" data-title="Into the alpine">
+            <div class="image-wrap">
+              <img src="https://images.unsplash.com/photo-1486911278844-a81c5267e227?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Alpine peaks beneath a clear sky" loading="lazy" />
+              <button class="select-check" type="button" aria-label="Select Into the alpine" aria-pressed="false">✓</button>
+              <button class="expand-btn" type="button" aria-label="View Into the alpine larger">⛶</button>
+            </div><div class="image-meta"><span>Into the alpine</span><span>1536 × 1024</span></div>
+          </article>
+          <article class="image-card" role="group" tabindex="0" aria-label="A quieter place sample image" data-title="A quieter place">
+            <div class="image-wrap">
+              <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Mountain range above a green alpine valley" loading="lazy" />
+              <button class="select-check" type="button" aria-label="Select A quieter place" aria-pressed="false">✓</button>
+              <button class="expand-btn" type="button" aria-label="View A quieter place larger">⛶</button>
+            </div><div class="image-meta"><span>A quieter place</span><span>1536 × 1024</span></div>
+          </article>
+        </div>
+
+        <div class="selection-bar" id="selectionBar">
+          <div>
+            <strong id="selectionTitle">1 sample image selected</strong>
+            <p><span id="selectionName">Morning refuge</span> · Example photo · 1536 × 1024</p>
+            <div class="link-row">
+              <button type="button" data-preview-action="Create variations">Create variations</button><span>·</span>
+              <button type="button" data-preview-action="Upscale">Upscale 2×</button><span>·</span>
+              <button type="button" data-preview-action="Save">Save to library</button>
+            </div>
+          </div>
+          <div class="selection-actions">
+            <button class="secondary-btn" type="button" data-preview-action="Animate">▣ Animate</button>
+            <button class="download-btn" type="button" data-preview-action="Download">⇩ Download</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="historyView" class="history-empty" role="tabpanel" aria-labelledby="historyTab" hidden>
+        <div class="history-icon" aria-hidden="true">▧</div>
+        <h3>No saved creations</h3>
+        <p>Your image history will appear here when a generation service is connected.</p>
+      </div>
+    </section>
+  </section>
+
+  <p class="connection-note"><strong>Preview mode.</strong> Prompt settings and gallery controls are interactive, but they do not generate or save images. Connect an image generation provider to create your own results.</p>
+</main>
+
+<div class="modal" id="imageModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Expanded sample image">
+  <button class="modal-close" id="modalClose" type="button" aria-label="Close image preview">×</button>
+  <img id="modalImage" src="" alt="Expanded sample preview" />
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>

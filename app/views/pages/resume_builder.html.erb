@@ -1,0 +1,315 @@
+<% content_for :title, "ResumeCraft | Resume Builder" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "resume_builder", "data-turbo-track": "reload" %>
+<% end %>
+
+<div class="resume-builder-app" data-resume-builder>
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="brand-mark" aria-hidden="true">M</div>
+        <div>
+          <div class="brand-name">MisbahExploitAI</div>
+          <div class="brand-subtitle">Build evidence-first resumes.</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <%= link_to "All services", all_service_path, class: "btn btn-ghost", data: { turbo: false } %>
+        <button class="btn btn-ghost" id="newResumeBtn" type="button"><span class="icon">＋</span> New</button>
+        <button class="btn btn-ghost" id="importBtn" type="button"><span class="icon">↥</span> Import</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden />
+        <button class="btn btn-ghost" id="exportBtn" type="button"><span class="icon">↓</span> Export</button>
+        <button class="btn btn-primary" id="printBtn" type="button"><span class="icon">▣</span> Print / PDF</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="editor-panel" aria-label="Resume editor">
+        <div class="editor-header">
+          <div>
+            <p class="eyebrow">Resume editor</p>
+            <h1>Build the evidence.</h1>
+          </div>
+          <div class="save-status" id="saveStatus" aria-live="polite">
+            <span class="status-dot"></span> Autosaved
+          </div>
+        </div>
+
+        <div class="progress-card">
+          <div class="progress-meta">
+            <span>Profile completeness</span>
+            <strong id="completionPercent">0%</strong>
+          </div>
+          <div class="progress-track"><div class="progress-bar" id="completionBar"></div></div>
+          <p id="completionHint">Start with your name, headline and contact details.</p>
+        </div>
+
+        <nav class="editor-nav" aria-label="Editor sections">
+          <button class="section-tab is-active" type="button" data-target="personalSection">Personal</button>
+          <button class="section-tab" type="button" data-target="summarySection">Summary</button>
+          <button class="section-tab" type="button" data-target="experienceSection">Experience</button>
+          <button class="section-tab" type="button" data-target="educationSection">Education</button>
+          <button class="section-tab" type="button" data-target="skillsSection">Skills</button>
+          <button class="section-tab" type="button" data-target="projectsSection">Projects</button>
+          <button class="section-tab" type="button" data-target="credentialsSection">Credentials</button>
+          <button class="section-tab" type="button" data-target="linksSection">Links</button>
+          <button class="section-tab" type="button" data-target="settingsSection">Design</button>
+          <button class="section-tab analyzer-tab" type="button" data-target="analyzerSection">Analyze</button>
+        </nav>
+
+        <div class="editor-scroll">
+          <section class="editor-section is-active" id="personalSection">
+            <div class="section-heading">
+              <div><h2>Personal details</h2><p>Keep contact details easy to scan and verify.</p></div>
+            </div>
+            <div class="form-grid two-col">
+              <label class="field"><span>Full name</span><input id="fullName" data-field="fullName" type="text" maxlength="80" placeholder="e.g. Misbah Kurniawan" /></label>
+              <label class="field"><span>Professional title</span><input id="headline" data-field="headline" type="text" maxlength="100" placeholder="e.g. Full-Stack Software Engineer" /></label>
+              <label class="field"><span>Email</span><input id="email" data-field="email" type="email" maxlength="120" placeholder="you@example.com" /></label>
+              <label class="field"><span>Phone</span><input id="phone" data-field="phone" type="tel" maxlength="40" placeholder="+62 812 3456 7890" /></label>
+              <label class="field full"><span>Location <small>city / region is enough</small></span><input id="location" data-field="location" type="text" maxlength="100" placeholder="Depok, West Java, Indonesia" /></label>
+            </div>
+
+            <div class="photo-card">
+              <div class="photo-preview" id="photoPreview"><span>Photo</span></div>
+              <div class="photo-copy">
+                <strong>Profile photo</strong>
+                <p>Upload a portrait and it will immediately appear in the A4 preview. You can turn it off later in Design.</p>
+                <div class="photo-meta" id="photoMeta">No image selected</div>
+                <div class="inline-actions">
+                  <label class="btn btn-secondary file-label" for="photoInput">Upload photo</label>
+                  <button class="btn btn-ghost danger-text" id="removePhotoBtn" type="button">Remove</button>
+                </div>
+              </div>
+              <input id="photoInput" type="file" accept="image/*" hidden />
+            </div>
+          </section>
+
+          <section class="editor-section" id="summarySection">
+            <div class="section-heading">
+              <div><h2>Professional summary</h2><p>Use 3–5 focused lines covering specialty, technology, scope and evidence.</p></div>
+              <span class="char-count" id="summaryCount">0 / 500</span>
+            </div>
+            <label class="field">
+              <span>Summary</span>
+              <textarea id="summary" data-field="summary" rows="8" maxlength="500" placeholder="Software engineer specializing in Java and React. Built REST APIs and responsive web applications, with a focus on reliable systems, security and measurable delivery outcomes."></textarea>
+            </label>
+            <div class="tip-box">
+              <span class="tip-icon">✦</span>
+              <div><strong>Pro tip</strong><p>Prefer specific strengths and outcomes over phrases like “hardworking”, “fast learner” or “team player”.</p></div>
+            </div>
+          </section>
+
+          <section class="editor-section" id="experienceSection">
+            <div class="section-heading">
+              <div><h2>Experience</h2><p>Write bullets as Action + Technology + What you built + Result.</p></div>
+              <button class="btn btn-secondary" id="addExperienceBtn" type="button">＋ Add role</button>
+            </div>
+            <div id="experienceList" class="repeat-list"></div>
+            <div class="coach-note"><strong>Impact check:</strong> quantify outcomes when you can. Never invent metrics; add a placeholder and verify it later.</div>
+          </section>
+
+          <section class="editor-section" id="educationSection">
+            <div class="section-heading">
+              <div><h2>Education</h2><p>Include your degree, school, dates and useful details.</p></div>
+              <button class="btn btn-secondary" id="addEducationBtn" type="button">＋ Add education</button>
+            </div>
+            <div id="educationList" class="repeat-list"></div>
+          </section>
+
+          <section class="editor-section" id="skillsSection">
+            <div class="section-heading">
+              <div><h2>Technical skills</h2><p>Group relevant technologies mentally by domain; the output stays simple and ATS-readable.</p></div>
+            </div>
+            <label class="field">
+              <span>Skills <small>comma separated</small></span>
+              <input id="skills" data-field="skills" type="text" maxlength="1000" placeholder="JavaScript, TypeScript, React, Node.js, Java, Quarkus, Oracle, Docker" />
+            </label>
+            <div class="chip-preview" id="skillChips"></div>
+          </section>
+
+          <section class="editor-section" id="projectsSection">
+            <div class="section-heading">
+              <div><h2>Projects</h2><p>Show shipped work that proves the skills you want to be hired for.</p></div>
+              <button class="btn btn-secondary" id="addProjectBtn" type="button">＋ Add project</button>
+            </div>
+            <div id="projectsList" class="repeat-list"></div>
+          </section>
+
+          <section class="editor-section" id="credentialsSection">
+            <div class="section-heading">
+              <div><h2>Credentials</h2><p>Certifications and achievements can add evidence without adding decorative clutter.</p></div>
+            </div>
+
+            <div class="subsection-block">
+              <div class="mini-heading"><div><strong>Certifications</strong><span>Optional but useful when they support the target role.</span></div><button class="btn btn-secondary btn-small" id="addCertificationBtn" type="button">＋ Add</button></div>
+              <div id="certificationList" class="repeat-list"></div>
+            </div>
+
+            <div class="subsection-block">
+              <div class="mini-heading"><div><strong>Achievements</strong><span>Awards, measurable accomplishments, competitions or leadership evidence.</span></div><button class="btn btn-secondary btn-small" id="addAchievementBtn" type="button">＋ Add</button></div>
+              <div id="achievementList" class="repeat-list"></div>
+            </div>
+          </section>
+
+          <section class="editor-section" id="linksSection">
+            <div class="section-heading">
+              <div><h2>Professional links</h2><p>Use links recruiters can verify: GitHub, LinkedIn, portfolio and project URLs.</p></div>
+            </div>
+            <div class="form-grid two-col">
+              <label class="field"><span>LinkedIn</span><input id="linkedin" data-field="linkedin" type="url" maxlength="200" placeholder="https://linkedin.com/in/yourname" /></label>
+              <label class="field"><span>GitHub</span><input id="github" data-field="github" type="url" maxlength="200" placeholder="https://github.com/username" /></label>
+              <label class="field full"><span>Portfolio / Website</span><input id="website" data-field="website" type="url" maxlength="200" placeholder="https://yourportfolio.dev" /></label>
+            </div>
+          </section>
+
+          <section class="editor-section" id="settingsSection">
+            <div class="section-heading">
+              <div><h2>Design</h2><p>Keep the exported resume modern, restrained and readable.</p></div>
+            </div>
+            <div class="design-grid">
+              <div class="setting-block">
+                <span class="setting-label">Template</span>
+                <div class="template-options" id="templateOptions">
+                  <button class="template-option is-selected" type="button" data-template="modern"><span class="mini-resume modern-mini"></span><strong>Modern</strong><small>Balanced</small></button>
+                  <button class="template-option" type="button" data-template="classic"><span class="mini-resume classic-mini"></span><strong>Classic</strong><small>Traditional</small></button>
+                  <button class="template-option" type="button" data-template="compact"><span class="mini-resume compact-mini"></span><strong>Compact</strong><small>Dense</small></button>
+                </div>
+              </div>
+
+              <div class="setting-block">
+                <span class="setting-label">Accent</span>
+                <div class="accent-options" id="accentOptions">
+                  <button class="accent-swatch is-selected" type="button" data-accent="#7c6ce5" style="--swatch:#7c6ce5" aria-label="Purple"></button>
+                  <button class="accent-swatch" type="button" data-accent="#5c78d6" style="--swatch:#5c78d6" aria-label="Blue"></button>
+                  <button class="accent-swatch" type="button" data-accent="#2e9d67" style="--swatch:#2e9d67" aria-label="Green"></button>
+                  <button class="accent-swatch" type="button" data-accent="#d26c83" style="--swatch:#d26c83" aria-label="Rose"></button>
+                  <button class="accent-swatch" type="button" data-accent="#d89b32" style="--swatch:#d89b32" aria-label="Amber"></button>
+                </div>
+              </div>
+
+              <div class="setting-block full">
+                <div class="toggle-row"><div><strong>Show photo on resume</strong><p>Disabled by default for the most ATS-conservative output.</p></div><label class="switch"><input id="showPhoto" type="checkbox" /><span class="slider"></span></label></div>
+                <div class="toggle-row"><div><strong>Compact spacing</strong><p>Use this when you need to fit more verified content on one page.</p></div><label class="switch"><input id="compactSpacing" type="checkbox" /><span class="slider"></span></label></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="editor-section" id="analyzerSection">
+            <div class="section-heading">
+              <div><h2>Resume analyzer</h2><p>Turn the source criteria into practical checks before you export.</p></div>
+              <button class="btn btn-primary" id="runAnalysisBtn" type="button">Analyze resume</button>
+            </div>
+
+            <div class="analyzer-hero" id="analysisHero">
+              <div class="score-ring" id="overallScore">0</div>
+              <div>
+                <p class="eyebrow">Quality score</p>
+                <h3 id="analysisTitle">Ready for a first pass</h3>
+                <p id="analysisSubtitle">Add your core content, then run the analyzer to surface high-value improvements.</p>
+              </div>
+            </div>
+
+            <div class="score-grid" id="scoreGrid"></div>
+
+            <div class="analysis-grid">
+              <div class="analysis-card">
+                <div class="analysis-card-head"><div><strong>ATS checker</strong><span>Parser-friendly structure and content signals</span></div><span class="check-pill" id="atsStatus">Not checked</span></div>
+                <div id="atsChecklist" class="check-list"></div>
+              </div>
+
+              <div class="analysis-card">
+                <div class="analysis-card-head"><div><strong>Job description matcher</strong><span>Paste a posting to compare relevant keywords</span></div><span class="check-pill neutral" id="matchStatus">Waiting</span></div>
+                <label class="field"><span>Target job description <small>optional</small></span><textarea id="jobDescription" rows="8" placeholder="Paste the job description here. Example: Java, Spring Boot, REST APIs, PostgreSQL, Docker, AWS..."></textarea></label>
+                <div class="match-summary" id="matchSummary">No job description analyzed yet.</div>
+                <div class="keyword-columns">
+                  <div><strong>Matched</strong><div id="matchedKeywords" class="keyword-list"></div></div>
+                  <div><strong>Consider adding</strong><div id="missingKeywords" class="keyword-list"></div></div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="analysis-note"><strong>Truth rule:</strong> the analyzer can detect structure and evidence patterns, but it cannot verify whether a claimed metric is true. Verify every number, credential and accomplishment before sending a resume.</div>
+          </section>
+        </div>
+      </aside>
+
+      <section class="preview-panel" aria-label="Resume preview">
+        <div class="preview-toolbar">
+          <div>
+            <p class="eyebrow">Live preview</p>
+            <div class="preview-title-row"><h2>A4 Resume</h2><span class="unsaved-badge" id="previewBadge">Live</span></div>
+          </div>
+          <div class="preview-tools">
+            <button class="icon-btn" id="zoomOutBtn" type="button" aria-label="Zoom out">−</button>
+            <span id="zoomValue">90%</span>
+            <button class="icon-btn" id="zoomInBtn" type="button" aria-label="Zoom in">＋</button>
+          </div>
+        </div>
+
+        <div class="preview-stage" id="previewStage">
+          <div class="a4-drop-hint" id="a4DropHint" aria-hidden="true">
+            <div class="a4-drop-icon">↥</div>
+            <strong>Drop profile image here</strong>
+            <span>Release to place it on the A4 resume</span>
+          </div>
+          <article class="resume-paper template-modern" id="resumePaper" aria-label="Generated resume" tabindex="0">
+            <div class="resume-header">
+              <div class="resume-header-copy">
+                <div class="resume-name" id="previewName">Your Name</div>
+                <div class="resume-headline" id="previewHeadline">Your Professional Title</div>
+                <div class="contact-line" id="previewContacts"></div>
+              </div>
+              <div class="resume-photo" id="resumePhoto"><span>Photo</span></div>
+            </div>
+
+            <div class="resume-body">
+              <section class="resume-section" id="previewSummarySection">
+                <div class="resume-section-title">Profile</div>
+                <p class="resume-summary" id="previewSummary">A focused professional summary will appear here once you start writing.</p>
+              </section>
+
+              <section class="resume-section" id="previewSkillsSection">
+                <div class="resume-section-title">Technical Skills</div>
+                <div id="previewSkills" class="resume-skills"></div>
+              </section>
+
+              <section class="resume-section" id="previewExperienceSection">
+                <div class="resume-section-title">Experience</div>
+                <div id="previewExperience"></div>
+              </section>
+
+              <section class="resume-section" id="previewProjectsSection">
+                <div class="resume-section-title">Projects</div>
+                <div id="previewProjects"></div>
+              </section>
+
+              <section class="resume-section" id="previewEducationSection">
+                <div class="resume-section-title">Education</div>
+                <div id="previewEducation"></div>
+              </section>
+
+              <section class="resume-section" id="previewCertificationSection">
+                <div class="resume-section-title">Certifications</div>
+                <div id="previewCertifications"></div>
+              </section>
+
+              <section class="resume-section" id="previewAchievementSection">
+                <div class="resume-section-title">Achievements</div>
+                <div id="previewAchievements"></div>
+              </section>
+
+              <section class="resume-section links-preview-section" id="previewLinksSection">
+                <div class="resume-section-title">Links</div>
+                <div class="resume-links" id="previewLinks"></div>
+              </section>
+            </div>
+          </article>
+        </div>
+        <div class="preview-footer"><span>Tip: use Print / PDF for a crisp, selectable A4 export.</span><span>Vanilla HTML · CSS · JS</span></div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
